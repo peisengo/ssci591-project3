@@ -31,11 +31,3 @@ Address text alone cannot identify every county location because many offices ar
 ## Credits
 
 California DMV supplied the location data. The U.S. Census Bureau supplied the boundary. Esri supplied the SDK, basemaps, and starting sample. OpenAI Codex assisted with source verification, implementation, interface design, debugging, and documentation. Review and understand the code before submitting it as coursework.
-
----
-
-## Run and publish
-
-Open `index.html` through a local web server or publish it on GitHub Pages. There is no build step, framework, API key, or backend. For local preview, run `python -m http.server 8765` in this folder and visit http://localhost:8765.
-
-For GitHub Pages, upload `index.html` and this README to the repository root. In **Settings → Pages**, choose **Deploy from a branch**, the **main** branch, and **/ (root)**. Test the resulting public URL in a private browser window and submit both that URL and the repository URL on Brightspace.
