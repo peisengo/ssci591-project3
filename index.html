@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Explore official DMV office locations within Los Angeles County. Search by office name, address, or ZIP code.">
+  <title>LA County DMV Office Finder</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23146c94'/%3E%3Ccircle cx='16' cy='16' r='7' fill='white'/%3E%3C/svg%3E">
+  <!-- Adapted from Esri's Intro to FeatureLayer sample; see README.md. -->
+  <script type="module" src="https://js.arcgis.com/5.1/"></script>
+  <style>
+    :root{font-family:Arial,Helvetica,sans-serif;color:#172e40;background:#f7f6f2;font-synthesis:none;--blue:#146c94;--muted:#596c79;--line:#dedfd9;--calcite-color-brand:#146c94}
+    *{box-sizing:border-box}body{margin:0}a{color:#146487;text-underline-offset:3px}button,input{font:inherit}button{cursor:pointer}button:disabled{cursor:wait;opacity:.5}button:focus-visible,a:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid #df851f;outline-offset:3px}
+    header{padding:22px 30px 19px;border-bottom:1px solid var(--line);background:#fffefb}.eyebrow{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;display:flex;align-items:center;gap:9px}.eyebrow:before{content:"";width:9px;height:9px;background:#dc8436;border-radius:50%}.heading{display:flex;align-items:center;justify-content:space-between;gap:24px}h1{font-size:clamp(25px,3vw,36px);letter-spacing:-1.2px;margin:9px 0 8px;font-weight:700}.tag{white-space:nowrap;border:1px solid #cddbdc;border-radius:24px;padding:9px 13px;font-size:12px;color:#365b64;background:#f1f7f5}.about{font-size:13px;line-height:1.6;max-width:1080px;color:var(--muted);margin:0}
+    main{display:grid;grid-template-columns:330px minmax(0,1fr);height:calc(100dvh - 191px);min-height:570px;border-bottom:1px solid var(--line)}aside{background:#fffefb;display:flex;flex-direction:column;overflow:hidden;border-right:1px solid var(--line)}.sidebar-top{padding:23px 22px 17px}.section-label{font-size:10px;letter-spacing:1.6px;font-weight:700;color:var(--muted);text-transform:uppercase}.total{font-size:42px;letter-spacing:-2px;font-weight:700;line-height:1;margin:10px 0 6px}.total span{font-size:14px;letter-spacing:0;font-weight:400;color:var(--muted);margin-left:7px}.scope{font-size:12px;color:var(--muted);margin:0 0 18px;line-height:1.5}.search-label{display:block;font-size:12px;font-weight:700;margin-bottom:8px}.search-wrap{position:relative}#search{width:100%;padding:12px 35px 12px 12px;border:1px solid #bdc9cc;background:white;border-radius:6px;font-size:13px;color:#172e40}#clear{position:absolute;right:4px;top:4px;background:none;border:0;width:30px;height:32px;color:#526875;font-size:21px}.list-meta{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:12px 22px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);font-size:11px;color:var(--muted)}#reset{border:0;background:none;color:#146487;padding:3px 0;text-decoration:underline;text-underline-offset:3px;font-size:11px}.offices{list-style:none;padding:0;margin:0;overflow:auto;flex:1}.office{width:100%;text-align:left;border:0;border-bottom:1px solid #ecece6;background:transparent;padding:15px 22px;display:flex;gap:12px;align-items:flex-start;color:#172e40}.office:hover{background:#f0f5f6}.office[aria-pressed="true"]{background:#e7f1f5;box-shadow:inset 3px 0 #146c94}.office-dot{width:9px;height:9px;border-radius:50%;background:#146c94;box-shadow:0 0 0 3px #e5eff3;flex:none;margin-top:5px}.office strong{display:block;font-size:13px;line-height:1.4;margin-bottom:4px}.office small{display:block;line-height:1.5;font-size:11px;color:var(--muted);white-space:pre-line}.empty{padding:25px 22px;color:var(--muted);font-size:13px;line-height:1.6}.sidebar-note{padding:13px 22px;border-top:1px solid var(--line);font-size:11px;color:var(--muted);line-height:1.5;background:#faf9f4}.map-panel{position:relative;min-width:0;background:#e7edef}arcgis-map{display:block;width:100%;height:100%}.map-badge{position:absolute;top:17px;left:70px;z-index:2;background:#fffefbf2;border:1px solid #d8e0e1;border-radius:5px;padding:10px 13px;box-shadow:0 2px 9px #172e4010;font-size:11px;pointer-events:none}.map-badge strong{display:block;font-size:12px;margin-bottom:3px}.map-badge span{color:var(--muted)}.map-actions{position:absolute;top:17px;right:17px;z-index:2;display:flex;gap:7px}.map-actions button{background:#fffefb;border:1px solid #cfdadd;padding:10px 12px;color:#254656;border-radius:5px;font-size:12px;box-shadow:0 2px 9px #172e4010}.map-actions button:hover{background:#edf4f6}.status{position:absolute;bottom:48px;left:50%;transform:translateX(-50%);z-index:3;max-width:90%;background:#172e40;color:white;padding:11px 16px;font-size:12px;line-height:1.5;border-radius:6px;box-shadow:0 3px 16px #172e4020}.status[data-state="error"]{background:#873a2c}.status[hidden]{display:none}.status button{margin-left:10px;background:white;color:#172e40;border:0;border-radius:3px;padding:4px 8px;font-size:12px}footer{padding:12px 24px;display:flex;justify-content:space-between;gap:15px;align-items:flex-start;font-size:11px;line-height:1.5;color:var(--muted)}footer p{margin:0}details{max-width:700px}summary{cursor:pointer;color:#146487}details p{padding-top:8px}#load-time{white-space:nowrap}.esri-popup__content{font-size:13px}
+    @media(min-width:1500px){main{grid-template-columns:370px minmax(0,1fr)}}
+    @media(max-width:760px){header{padding:18px 18px 16px}.heading{gap:8px}.tag{display:none}h1{letter-spacing:-.7px}.about{font-size:12px}main{display:flex;flex-direction:column-reverse;height:auto;min-height:0}.map-panel{height:62dvh;min-height:420px}aside{height:430px;border-right:0;border-top:1px solid var(--line)}.sidebar-top{padding:17px 18px 13px}.total{font-size:30px}.scope{margin-bottom:12px}.offices{min-height:100px}.map-badge{top:12px;left:58px;padding:8px}.map-actions{top:auto;bottom:47px;right:12px;flex-direction:column}.map-actions button{padding:9px}.status{bottom:125px}footer{padding:14px 18px;flex-direction:column;gap:8px}}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="eyebrow">Los Angeles County · Public service locations</div>
+    <div class="heading"><h1>Find your DMV.</h1><span class="tag">SSCI 591 · Web GIS Project 3</span></div>
+    <p class="about">Explore DMV office locations within Los Angeles County and click a point to view its name, address, and ZIP code. Locations load directly from the <a href="https://www.arcgis.com/home/item.html?id=ca1d87b21cb14989bf2946976244c3c9" target="_blank" rel="noopener">California DMV dataset</a>, with the county boundary from the <a href="https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/State_County/MapServer/1" target="_blank" rel="noopener">U.S. Census Bureau</a>. Adapted from Esri's Intro to FeatureLayer sample, this map changes the extent, basemap, symbols, title, and popups. A searchable office list, county outline, Legend, and Home component help you explore the area.</p>
+  </header>
+  <main>
+    <aside aria-label="DMV office directory">
+      <div class="sidebar-top">
+        <div class="section-label">Your county, at a glance</div>
+        <div class="total"><output id="total">—</output><span>DMV locations</span></div>
+        <p class="scope">Within the official LA County boundary.<br>Includes specialized DMV facilities.</p>
+        <label class="search-label" for="search">Find an office</label>
+        <div class="search-wrap"><input type="search" id="search" placeholder="Name, address, or ZIP code" autocomplete="off" disabled><button id="clear" aria-label="Clear search" hidden>×</button></div>
+      </div>
+      <div class="list-meta"><span id="results" role="status" aria-live="polite">Connecting to official data…</span><button id="reset" disabled>Reset view</button></div>
+      <ul id="offices" class="offices" aria-label="Search results"><li class="empty">Loading the county boundary and DMV locations…</li></ul>
+      <div class="sidebar-note">Select a location to zoom in and open its details. Check the <a href="https://www.dmv.ca.gov/portal/locations/field-offices/" target="_blank" rel="noopener">DMV website</a> for services, hours, and appointments before visiting.</div>
+    </aside>
+    <section class="map-panel" aria-label="Interactive DMV location map">
+      <arcgis-map basemap="gray-vector" center="-118.25,34.1" zoom="9">
+        <arcgis-zoom slot="top-left"></arcgis-zoom>
+        <arcgis-home slot="top-left"></arcgis-home>
+        <arcgis-legend slot="bottom-left"></arcgis-legend>
+        <arcgis-scale-bar slot="bottom-right" unit="dual"></arcgis-scale-bar>
+        <arcgis-popup slot="popup"></arcgis-popup>
+      </arcgis-map>
+      <div class="map-badge"><strong>LOS ANGELES COUNTY</strong><span>Office locations · Official source</span></div>
+      <div class="map-actions"><button id="fit" disabled>Zoom to results</button><button id="boundary" disabled aria-pressed="true">Hide county outline</button></div>
+      <div id="status" class="status" role="status" aria-live="polite">Loading map and official data…</div>
+    </section>
+  </main>
+  <footer>
+    <details><summary>Data sources &amp; map notes</summary><p>DMV: <a href="https://services6.arcgis.com/8zbIxywG5xu2vq8a/arcgis/rest/services/Department_of_Motor_Vehicles_Office_Locations/FeatureServer/0" target="_blank" rel="noopener">California DMV office locations</a>. Boundary: U.S. Census Bureau TIGERweb, county GEOID 06037. Points are selected by intersection with the actual county polygon, including offshore islands. This inventory includes specialized offices and is not a complete directory of kiosks or business partners. It does not provide live wait times, operating status, or service availability. Data is requested on page load; source updates may change the count. Educational project; not an official DMV application. Built with the <a href="https://developers.arcgis.com/javascript/latest/sample-code/intro-featurelayer/" target="_blank" rel="noopener">Esri Intro to FeatureLayer sample</a> and ArcGIS Maps SDK for JavaScript 5.1.</p></details>
+    <p id="load-time">Official services · Loaded on demand</p>
+  </footer>
+  <script type="module">
+    // Keep service addresses together so sources are easy to inspect or replace.
+    const DMV_URL = "https://services6.arcgis.com/8zbIxywG5xu2vq8a/arcgis/rest/services/Department_of_Motor_Vehicles_Office_Locations/FeatureServer/0";
+    const COUNTY_URL = "https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/State_County/MapServer/1";
+    const $ = (id) => document.getElementById(id);
+    const mapElement = document.querySelector("arcgis-map");
+    let offices = [], dmvLayer, countyGeometry, countyViewpoint, layerView, highlight;
+    let selectedId = null, navigation = 0;
+    const startupTimer = setTimeout(() => {
+      if ($("search").disabled) showError("The map is taking longer than expected. Check your connection or reload.");
+    }, 60000);
+
+    function showError(message) {
+      const status = $("status");
+      status.hidden = false;
+      status.dataset.state = "error";
+      status.textContent = message + " ";
+      const retry = document.createElement("button");
+      retry.textContent = "Reload";
+      retry.onclick = () => location.reload();
+      status.append(retry);
+    }
+    // Escape is unnecessary here: all service strings are inserted as textContent.
+    function renderList(features) {
+      $("offices").replaceChildren();
+      $("results").textContent = `${features.length} of ${offices.length} locations`;
+      if (!features.length) {
+        const item = document.createElement("li");
+        item.className = "empty";
+        item.textContent = "No matching offices. Try another name, address, or ZIP code.";
+        $("offices").append(item);
+      }
+      for (const feature of features) {
+        const { Name, Address, FID } = feature.attributes;
+        const item = document.createElement("li");
+        const button = document.createElement("button");
+        button.className = "office";
+        button.dataset.id = FID;
+        button.setAttribute("aria-pressed", String(FID === selectedId));
+        const dot = document.createElement("span"); dot.className = "office-dot"; dot.setAttribute("aria-hidden", "true");
+        const text = document.createElement("span");
+        const name = document.createElement("strong"); name.textContent = Name;
+        const address = document.createElement("small"); address.textContent = Address || "Address not provided";
+        text.append(name, address); button.append(dot, text);
+        button.onclick = () => selectOffice(feature);
+        item.append(button); $("offices").append(item);
+      }
+    }
+    function markSelected(id) {
+      selectedId = id;
+      document.querySelectorAll(".office").forEach(button => button.setAttribute("aria-pressed", String(Number(button.dataset.id) === id)));
+      highlight?.remove();
+      highlight = id === null ? null : layerView.highlight(id);
+    }
+    async function selectOffice(feature) {
+      const token = ++navigation;
+      markSelected(feature.attributes.FID);
+      try {
+        await mapElement.goTo({ target: feature.geometry, zoom: 13 });
+        if (token !== navigation) return;
+        await mapElement.view.openPopup({ features: [feature], location: feature.geometry });
+      } catch (error) { if (error.name !== "AbortError") console.error(error); }
+    }
+    function filterOffices() {
+      navigation++;
+      const term = $("search").value.trim().toLocaleLowerCase();
+      const filtered = offices.filter(({ attributes: a }) => [a.Name, a.Address, a.ZIP].some(value => String(value ?? "").toLocaleLowerCase().includes(term)));
+      // The map and list always show the same subset; no text is interpolated into SQL.
+      layerView.filter = { objectIds: filtered.map(f => f.attributes.FID), where: filtered.length ? "1=1" : "1=0" };
+      mapElement.view.closePopup(); markSelected(null);
+      $("clear").hidden = !$("search").value;
+      renderList(filtered);
+      $("fit").disabled = !filtered.length;
+      return filtered;
+    }
+    async function resetView() {
+      $("search").value = "";
+      filterOffices();
+      try { await mapElement.goTo(countyViewpoint); } catch (error) { if (error.name !== "AbortError") console.error(error); }
+    }
+
+    try {
+      await customElements.whenDefined("arcgis-map");
+      const FeatureLayer = await $arcgis.import("@arcgis/core/layers/FeatureLayer.js");
+      const reactiveUtils = await $arcgis.import("@arcgis/core/core/reactiveUtils.js");
+      await mapElement.viewOnReady();
+
+      const county = new FeatureLayer({
+        url: COUNTY_URL, title: "Los Angeles County boundary", minScale: 0, maxScale: 0,
+        definitionExpression: "STATE = '06' AND COUNTY = '037'",
+        popupEnabled: false,
+        renderer: { type: "simple", label: "County boundary", symbol: { type: "simple-fill", color: [20,108,148,0.025], outline: { color: "#b9793f", width: 1.5, style: "dash" } } }
+      });
+      const countyResult = await county.queryFeatures({ where: "STATE = '06' AND COUNTY = '037'", outFields: ["NAME", "GEOID"], returnGeometry: true, outSpatialReference: { wkid: 4326 } });
+      if (!countyResult.features.length) throw new Error("The county boundary was not returned by Census TIGERweb.");
+      countyGeometry = countyResult.features[0].geometry;
+
+      // The official sample's FeatureLayer URL, renderer, and popup are replaced here.
+      dmvLayer = new FeatureLayer({
+        url: DMV_URL, title: "DMV office locations", outFields: ["Name", "Address", "ZIP", "FAC_ID"],
+        renderer: { type: "simple", label: "DMV location", symbol: { type: "simple-marker", style: "circle", size: 10, color: "#146c94", outline: { color: "#ffffff", width: 1.6 } } },
+        popupTemplate: {
+          title: "{Name}",
+          content: [{ type: "fields", fieldInfos: [
+            { fieldName: "Name", label: "Office name" },
+            { fieldName: "Address", label: "Street address" },
+            { fieldName: "ZIP", label: "ZIP code" },
+            { fieldName: "FAC_ID", label: "Facility ID" }
+          ] }, { type: "text", text: "Includes specialized DMV facilities. Verify services and appointments on the <a href='https://www.dmv.ca.gov/portal/locations/field-offices/' target='_blank' rel='noopener'>official DMV website</a> before visiting." }]
+        }
+      });
+      // Spatial intersection avoids missing offices in other LA County cities.
+      const result = await dmvLayer.queryFeatures({ geometry: countyGeometry, spatialRelationship: "intersects", where: "1=1", outFields: ["*"], returnGeometry: true, outSpatialReference: { wkid: 4326 } });
+      if (result.exceededTransferLimit) throw new Error("The service returned an incomplete office list.");
+      offices = result.features.sort((a,b) => a.attributes.Name.localeCompare(b.attributes.Name));
+      offices.forEach(feature => { feature.popupTemplate = dmvLayer.popupTemplate; });
+      if (!offices.length) throw new Error("No DMV locations were returned inside the county boundary.");
+      const idField = dmvLayer.objectIdField;
+      if (idField !== "FID") throw new Error("The source ID field changed; the map needs an update.");
+      // Use the verified IDs on the remote FeatureLayer so points still load live.
+      dmvLayer.definitionExpression = `FID IN (${offices.map(f => f.attributes.FID).join(",")})`;
+      mapElement.map.addMany([county, dmvLayer]);
+      layerView = await mapElement.whenLayerView(dmvLayer);
+      // Frame the locations, including Catalina, rather than empty offshore county waters.
+      const officeExtent = countyGeometry.extent.clone();
+      officeExtent.xmin = Math.min(...offices.map(f => f.geometry.longitude));
+      officeExtent.xmax = Math.max(...offices.map(f => f.geometry.longitude));
+      officeExtent.ymin = Math.min(...offices.map(f => f.geometry.latitude));
+      officeExtent.ymax = Math.max(...offices.map(f => f.geometry.latitude));
+      await mapElement.goTo(officeExtent.expand(1.22), { animate: false });
+      countyViewpoint = mapElement.view.viewpoint.clone();
+      const home = document.querySelector("arcgis-home");
+      await home.componentOnReady();
+      home.viewpoint = countyViewpoint;
+      home.addEventListener("arcgisGo", () => { $("search").value = ""; filterOffices(); });
+      reactiveUtils.watch(() => mapElement.view.popup?.selectedFeature, (feature) => {
+        if (feature?.layer === dmvLayer) markSelected(feature.attributes.FID);
+      });
+      $("search").disabled = false;
+      for (const id of ["reset", "fit", "boundary"]) $(id).disabled = false;
+      $("total").textContent = offices.length;
+      renderList(offices);
+      $("search").addEventListener("input", filterOffices);
+      $("clear").onclick = () => { $("search").value = ""; filterOffices(); $("search").focus(); };
+      $("reset").onclick = resetView;
+      $("fit").onclick = async () => {
+        const subset = filterOffices();
+        try { await mapElement.goTo(subset.length === 1 ? { target: subset[0].geometry, zoom: 13 } : subset, { padding: 55 }); } catch (error) { if (error.name !== "AbortError") console.error(error); }
+      };
+      $("boundary").onclick = () => {
+        county.visible = !county.visible;
+        $("boundary").textContent = county.visible ? "Hide county outline" : "Show county outline";
+        $("boundary").setAttribute("aria-pressed", String(county.visible));
+      };
+      $("load-time").textContent = "Data loaded " + new Date().toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short", timeZone: "America/Los_Angeles" }) + " PT";
+      clearTimeout(startupTimer);
+      await reactiveUtils.whenOnce(() => !mapElement.view.updating);
+      $("status").hidden = true;
+      // Expose a small, read-only status summary for browser verification.
+      window.mapStatus = Object.freeze({ loaded: true, count: offices.length, county: "06037", source: DMV_URL });
+    } catch (error) {
+      clearTimeout(startupTimer);
+      console.error("DMV map initialization failed:", error);
+      $("results").textContent = "Data could not be loaded";
+      $("offices").replaceChildren();
+      const item = document.createElement("li"); item.className = "empty"; item.textContent = "Unable to load official data. Check your connection and reload the page."; $("offices").append(item);
+      showError("Official map data could not be loaded. " + error.message);
+    }
+  </script>
+</body>
+</html>
